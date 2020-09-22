@@ -190,3 +190,32 @@ ind = elasticsearch.client.IndicesClient(elastic)
 print(analyze(ind, names_index, 'uax_url_email', 'My email: test@gmail.com'))
 print(analyze(ind, names_index, 'ngram', 'My email: test@gmail.com'))
 print(analyze(ind, names_index, 'path_hierarchy', 'Users/Default/Desktop'))
+# usage of mappings
+mapping = {
+    'mappings': {
+        'properties': {
+            'desc': {
+                'type': 'text',
+                'analyzer': 'russian'
+            }
+        }
+    }
+}
+response = ind.create(index='weather', body=mapping)
+print(response)
+el1 = {
+    'desc': 'погода в Казани'
+}
+el2 = {
+    'desc': 'дождь в городе Казань'
+}
+insert(elastic, 'weather', 1, el1)
+insert(elastic, 'weather', 2, el2)
+res = elastic.search(index='weather', body={
+    'query': {
+        'match': {
+            'desc': 'найти значение погоды в городе Казани'
+        }
+    }
+})
+print(res)
